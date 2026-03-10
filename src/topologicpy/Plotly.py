@@ -859,7 +859,7 @@ class Plotly:
                        faceLegendGroup=3, 
                        intensityKey=None,
                        intensities=[],
-                       material = "plastic",
+                       material = "default",
                        materialKey=None,
                        ambient = None,
                        ambientKey=None,
@@ -1019,6 +1019,7 @@ class Plotly:
             matte        0.9      0.7       0.0        1.0     Flat, non-reflective surfaces
             metallic     0.3      0.8       0.9        0.2     Strong, sharp reflections
             plastic      0.6      0.9       0.2        0.4     Soft highlights, good shape readability
+            default      N/A      N/A       N/A        N/A     Flat shading is applied.
             Default is plastic.
         materialKey : str , optional
             The dictionary key under which the material string is stored. Default is None.
@@ -1077,7 +1078,8 @@ class Plotly:
             "glossy": {"ambient":0.5, "diffuse":0.9, "specular":0.6, "roughness":0.1},
             "matte": {"ambient":0.9, "diffuse":0.7, "specular":0.0, "roughness":1.0},
             "metallic": {"ambient":0.3, "diffuse":0.8, "specular":0.9, "roughness":0.2},
-            "plastic": {"ambient":0.6, "diffuse":0.9, "specular":0.2, "roughness":0.4}
+            "plastic": {"ambient":0.6, "diffuse":0.9, "specular":0.2, "roughness":0.4},
+            "default": {"ambient":None, "diffuse":None, "specular":None, "roughness":None}
         }
         def closest_index(input_value, values):
             return int(min(range(len(values)), key=lambda i: abs(values[i] - input_value)))
@@ -1168,6 +1170,12 @@ class Plotly:
                 groupList = None
             if len(labels) == 0:
                 labels = ""
+            if material == "default":
+                flatShading = True
+                lighting = None
+            else:
+                flatShading = False
+                lighting = dict(ambient=ambient, diffuse=diffuse, specular=specular, roughness=roughness)
             fData = go.Mesh3d(
                     x = x,
                     y = y,
@@ -1190,7 +1198,8 @@ class Plotly:
                     text = labels,
                     hovertext = labels,
                     showscale = False,
-                    lighting=dict(ambient=ambient, diffuse=diffuse, specular=specular, roughness=roughness)
+                    flatshading=flatShading,
+                    lighting= lighting
                 )
             return fData
 
